@@ -1,0 +1,54 @@
+
+[1mInitial resource allocation (minimum time criterium):[0m
+  T0 --> HC2_0 [startTime: 0, endTime: 58]
+  T1 --> HC2_1 [startTime: 58, endTime: 100]
+  T2 --> HC1_0 [startTime: 58, endTime: 64]
+  T3 --> HC2_2 [startTime: 58, endTime: 112]
+  T4 --> HC2_3 [startTime: 58, endTime: 128]
+  T5 --> HC2_4 [startTime: 58, endTime: 73]
+  T6 --> HC1_1 [startTime: 64, endTime: 91]
+  T7 --> HC2_5 [startTime: 64, endTime: 115]
+  T8 --> HC2_6 [startTime: 64, endTime: 100]
+  T9 --> HC1_2 [startTime: 64, endTime: 67]
+  T10 --> HC2_7 [startTime: 100, endTime: 127]
+  T11 --> HC1_3 [startTime: 100, endTime: 150]
+  T12 --> HC1_4 [startTime: 64, endTime: 107]
+  T13 --> HC2_8 [startTime: 107, endTime: 123]
+  T14 --> HC2_9 [startTime: 107, endTime: 124]
+  T15 --> HC1_5 [startTime: 107, endTime: 116]
+  T16 --> HC2_10 [startTime: 107, endTime: 113]
+  T17 --> HC1_6 [startTime: 107, endTime: 139]
+  T18 --> HC2_11 [startTime: 73, endTime: 88]
+  T19 --> HC2_12 [startTime: 73, endTime: 84]
+Overall time: 150
+Overall cost: 5827
+Maximum allowable time: 700
+
+[1mOptimisation:[0m
+There is a slower resource available for T9
+Time intervals have been recomputed:
+  T0 -> HC2_0 [startTime: 0, endTime: 58]
+  T1 -> HC2_1 [startTime: 58, endTime: 100]
+  T2 -> HC1_0 [startTime: 58, endTime: 64]
+  T3 -> HC2_2 [startTime: 58, endTime: 112]
+  T4 -> HC2_3 [startTime: 58, endTime: 128]
+  T5 -> HC2_4 [startTime: 58, endTime: 73]
+  T6 -> HC1_1 [startTime: 64, endTime: 91]
+  T7 -> HC2_5 [startTime: 64, endTime: 115]
+  T8 -> HC2_6 [startTime: 64, endTime: 100]
+  T9 -> PP2_0 [startTime: 64, endTime: 987]
+  T10 -> HC2_7 [startTime: 100, endTime: 127]
+  T11 -> HC1_3 [startTime: 100, endTime: 150]
+  T12 -> HC1_4 [startTime: 64, endTime: 107]
+  T13 -> HC2_8 [startTime: 107, endTime: 123]
+  T14 -> HC2_9 [startTime: 107, endTime: 124]
+  T15 -> HC1_5 [startTime: 107, endTime: 116]
+  T16 -> HC2_10 [startTime: 107, endTime: 113]
+  T17 -> HC1_6 [startTime: 107, endTime: 139]
+  T18 -> HC2_11 [startTime: 73, endTime: 88]
+  T19 -> HC2_12 [startTime: 73, endTime: 84]
+Overall Time: 987
+Overall Cost: 5918
+[1mThe maximum time 700 has been exceeded.
+Consider the allocation strategy proposed earlier.[0m
+
