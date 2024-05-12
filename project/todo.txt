@@ -1,0 +1,55 @@
+Temat projektu: 
+
+	Zaprojektować algorytm kosyntezy (algorytm konstrukcyjny) stricte na 
+    podstawie standaryzacji ("normalizacji"), uwzględniając bieżący stan systemu, 
+    czyli te czynniki globalne, które mogą aktualizować na bieżąco współczynniki 
+    standaryzacyjne. Druga część projektu: zaimplementować algorytm do 
+    przydziału nieprzewidzianych zadań.
+
+
+Plan postępowań:
+
+    1. Łączymy zadanie 6. (algorytm konstrukcyjny) i zadanie 9. 
+    (przydział nieprzewidzianych zadań).
+
+    2. Piszemy w C++.
+
+    3. Trzeba wymyślić dobry wzór (a może kilka) do tego, jak przeliczać 
+    współczynniki potrzebne do standaryzacji (w zadaniu 6. nie mieliśmy 
+    narzuconego wzoru i rozważaliśmy tylko przeliczenie w celu szybszej 
+    minimalizacji czasu wykonania).
+
+    4. Kod z zadania 6. trzeba uprościć i zoptymalizować, bo będziemy 
+    rozważać tylko jedną metodę (standaryzacja), ale równocześnie pilnując 
+    bierzącego stanu systemu.
+
+    5. Trzeba teraz zacząć uwzględniać szyny komunikacyjne i wymyślić, jak 
+    będziemy postępować, jeśli któregoś z zasobów nie da się połączyć z 
+    wybranym innym zasobem.
+
+    6. Kod z zadania 9. trzeba dopracować, tzn. dodać to, o czym dr Górski 
+    wspominał na zajęciach, czyli że powinniśmy zapobiec ponownemu 
+    szeregowaniu zadań wykonywanych na zasobach specjalistycznych.
+
+    7. Trzeba wygenerować kilka przykładowych grafów (od 10 do 30 węzłów) i 
+    przetestować na nich program zarówno pod względem implementacji 
+    algorytmu konstrukcyjnego, jak i przydziału nieprzewidzianych zadań, 
+    w których stosowaliśmy kryterium min(time * cost). Do tych testów należy 
+    narysować grafy i sprawdzić ręcznie wszystkie parametry, które się 
+    zmieniają na bieżąco.
+
+    8. Zrefaktoryzować i zoptymalizować cały kod projektu wszędzie, 
+    gdzie się da. Postarać się stosować współczesne narzędzia dostępne w 
+    bibliotece standardowej zgodnej ze standardem C++17 - C++20.
+
+    9. Utworzyć prosty interfejs do interakcji poprzez terminal.
+
+    10. Dodać Makefile do łatwego sterowania:
+        i. Tryb interaktywny - kosynteza;
+        ii. Tryb interaktywny - przydział nieprzewidzianych zadań;
+        iii. Uruchomienie testów.
+
+    11. Utworzyć plik README.
+    
+Stworzyć prezentację, w której opiszemy zastosowane algorytmy, wzory, testy 
+i odpowiednie schematy.
