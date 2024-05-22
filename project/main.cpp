@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "utilities.hpp"
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
@@ -16,6 +17,4 @@ int main(int argc, char *argv[]) {
   auto commMatrix = p.getCommMatrix();
   auto tasksMatrix = p.getTasksMatrix();
   p.debug();
-
-  
 }

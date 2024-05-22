@@ -27,6 +27,15 @@ auto standardiseData(Matrix<double> data, bool firstColumnOnly) {
 
 // *****************************************************************************
 
+double computeUsingStd(double p, double c, double t, double x, double y,
+                       double z) {
+  // Zwraca wynik wzoru na sumę składowych zależnych od standaryzowanych
+  // danych i współczynników.
+  return x * p + y * c + z * t;
+}
+
+// *****************************************************************************
+
 struct PE {
   double totalActiveTime; // ile do tej pory zasob byl uzywany
   int totalNumOfJobs; // dotychczasowa ilosc zadan

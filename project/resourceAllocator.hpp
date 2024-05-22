@@ -66,13 +66,6 @@ class ResourceAllocator {
         results.push_back(i);
     return results;
   }
-  
-  double computeUsingStd(double p, double c, double t, double x, double y,
-    double z) {
-    // Zwraca wynik wzoru na sumę składowych zależnych od standaryzowanych
-    // danych i współczynników. 
-    return x * p + y * c + z * t; 
-  }
 
   int findBest_std(int taskID) {
     // Znajduje najlepszy zasób zgodnie ze wzorem ComputeUsingStd
