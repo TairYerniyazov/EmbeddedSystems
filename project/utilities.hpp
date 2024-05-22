@@ -1,4 +1,5 @@
-/* W tym pliku mamy funkcje i strukture pomocnicze */
+/* FUNKCJE I STRUKTURY POMOCNICZE */
+
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
@@ -23,10 +24,10 @@ auto standardiseData(Matrix<double> data, bool firstColumnOnly) {
 // *****************************************************************************
 
 struct PE {
-  double totalActiveTime;
-  int totalNumOfJobs;
-  double lastTaskStartTime;
-  double lastTaskEndTime;
+  double totalActiveTime; // ile do tej pory zasob byl uzywany
+  int totalNumOfJobs; // dotychczasowa ilosc zadan
+  double lastTaskStartTime; 
+  double lastTaskEndTime; // kiedy zaczelo sie i skonczylo ostatnie zadanie
   int procID;
   std::string label;
   std::vector<int> channelIDs;
@@ -46,8 +47,8 @@ struct PE {
 
 struct Task {
   int id;
-  int resourceID;
-  bool reallocated;
+  int resourceID; // ID zasobu obliczeniowego przypisanego do zadania
+  bool reallocated; // czy zasob zostal juz zaalokowany czy tez nie
   Task() : id{-1}, resourceID{-1}, reallocated{false} {}
   Task(int id_, int resourceID_, double pathTime_)
       : id{id_}, resourceID{resourceID_}, reallocated{false} {}
@@ -55,12 +56,16 @@ struct Task {
   ~Task() {}
 };
 
+// Informacje o kosztach są w tabelach costMatrix oraz procMatrix. 
+// Informacje o koszcie uzyskujemy z tych tabel biorąc pod uwagę task -ID oraz proc - ID.
+
+
 // *****************************************************************************
 
 struct Channel {
-  double cost;
-  double bandwidth;
-  std::vector<bool> connections;
+  double cost; // koszt szyny kounikacyjnej z tabeli 
+  double bandwidth; 
+  std::vector<bool> connections; // ?
   int id;
   Channel(double c, double b, std::vector<bool> conn, int id_)
       : cost{c}, bandwidth{b}, connections{conn}, id{id_} {}
