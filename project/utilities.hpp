@@ -4,6 +4,16 @@
 #define UTILITIES_H
 
 #include "matrix.hpp"
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <numeric>
+
+
+
+
+
+
 
 auto standardiseData(Matrix<double> data, bool firstColumnOnly) {
   int d1 = data.d1;
@@ -71,5 +81,37 @@ struct Channel {
       : cost{c}, bandwidth{b}, connections{conn}, id{id_} {}
   ~Channel() {}
 };
+
+
+
+// *****************************************************************************
+
+// Funkcja softmax dla trzech współczynników
+// Funkcja std::exp(a) w C++ jest częścią biblioteki <cmath>
+// i służy do obliczania wartości funkcji wykładniczej eaea, 
+// gdzie ee jest podstawą logarytmu naturalnego, 
+//   wynoszącą około 2.71828. Jest to funkcja matematyczna, 
+//   która podnosi ee do potęgi określonej przez argument aa.
+
+// std::exp jest używany do przekształcenia każdego elementu wejściowego (współczynnika) 
+// w jego wartość wykładniczą. 
+// Dzięki temu możemy później łatwo obliczyć prawdopodobieństwa, które sumują się do 1. 
+
+std::vector<double> softmax(double a, double b, double c) {
+    // Obliczamy wartości wykładnicze dla każdego współczynnika
+    double exp_a = std::exp(a);
+    double exp_b = std::exp(b);
+    double exp_c = std::exp(c);
+    
+    // Sumujemy wartości wykładnicze
+    double sum_exp = exp_a + exp_b + exp_c;
+    
+    // Obliczamy wartości softmax
+    std::vector<double> result = { exp_a / sum_exp, exp_b / sum_exp, exp_c / sum_exp };
+    
+    return result;
+  }
+
+
 
 #endif
