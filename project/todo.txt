@@ -6,6 +6,12 @@ Temat projektu:
     standaryzacyjne. Druga część projektu: zaimplementować algorytm do 
     przydziału nieprzewidzianych zadań.
 
+Co już zrobiliśmy:
+
+    1. Wymyśliliśmy wzory.
+    2. Otrzymaliśmy odpowiedzi na pytania.
+    3. Dodaliśmy szkielet (w tym ResourceAllocator).
+    4. Utworzyliśmy plik z funkcjami i strukturami pomocnicznymi (utilities.hpp).
 
 Plan postępowań:
 
@@ -26,4 +32,3 @@ Plan postępowań:
     już zaalokowanych dotychczas i szeregujemy listowo.
 
     5. Utworzyć plik README + schemat, w którym bedą wszystkie wzory.
-    
