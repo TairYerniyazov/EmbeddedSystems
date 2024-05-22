@@ -12,44 +12,18 @@ Plan postępowań:
     1. Łączymy zadanie 6. (algorytm konstrukcyjny) i zadanie 9. 
     (przydział nieprzewidzianych zadań).
 
-    2. Piszemy w C++.
+    2. Dodać implementację wzoru na softmax przy przeliczeniu współczynników. Rozważamy
+    zaalokowane dotychczas. Wybieramy najlepsze zgodnie z naszym wzorem
+    standaryzacyjnym i potem patrzymy na to, które zasoby mamy wolne teraz,
+    a który wybraliśmy. Jeśli koszt i czas (oczywiście zależy od tego, co dla
+    nas w tej chwili jest ważniejsze) pasują, to wybieramy stary zasób i
+    wykonujemy na nim. Jeśli nie, to śmiało kupujemy nowy zasób.
 
-    3. Trzeba wymyślić dobry wzór (a może kilka) do tego, jak przeliczać 
-    współczynniki potrzebne do standaryzacji (w zadaniu 6. nie mieliśmy 
-    narzuconego wzoru i rozważaliśmy tylko przeliczenie w celu szybszej 
-    minimalizacji czasu wykonania).
+    3. Uwzględniamy szyny komunikacyjne (czyli tak jak to rozwiązanie z
+    zadania 7. dotyczącego algorytmu rafinacyjnego).
 
-    4. Kod z zadania 6. trzeba uprościć i zoptymalizować, bo będziemy 
-    rozważać tylko jedną metodę (standaryzacja), ale równocześnie pilnując 
-    bierzącego stanu systemu.
+    4. W przypadku nieprzewidzianych zadań nie ruszamy HC. Operujemy na zasobach
+    już zaalokowanych dotychczas i szeregujemy listowo.
 
-    5. Trzeba teraz zacząć uwzględniać szyny komunikacyjne i wymyślić, jak 
-    będziemy postępować, jeśli któregoś z zasobów nie da się połączyć z 
-    wybranym innym zasobem.
-
-    6. Kod z zadania 9. trzeba dopracować, tzn. dodać to, o czym dr Górski 
-    wspominał na zajęciach, czyli że powinniśmy zapobiec ponownemu 
-    szeregowaniu zadań wykonywanych na zasobach specjalistycznych.
-
-    7. Trzeba wygenerować kilka przykładowych grafów (od 10 do 30 węzłów) i 
-    przetestować na nich program zarówno pod względem implementacji 
-    algorytmu konstrukcyjnego, jak i przydziału nieprzewidzianych zadań, 
-    w których stosowaliśmy kryterium min(time * cost). Do tych testów należy 
-    narysować grafy i sprawdzić ręcznie wszystkie parametry, które się 
-    zmieniają na bieżąco.
-
-    8. Zrefaktoryzować i zoptymalizować cały kod projektu wszędzie, 
-    gdzie się da. Postarać się stosować współczesne narzędzia dostępne w 
-    bibliotece standardowej zgodnej ze standardem C++17 - C++20.
-
-    9. Utworzyć prosty interfejs do interakcji poprzez terminal.
-
-    10. Dodać Makefile do łatwego sterowania:
-        i. Tryb interaktywny - kosynteza;
-        ii. Tryb interaktywny - przydział nieprzewidzianych zadań;
-        iii. Uruchomienie testów.
-
-    11. Utworzyć plik README.
+    5. Utworzyć plik README + schemat, w którym bedą wszystkie wzory.
     
-Stworzyć prezentację, w której opiszemy zastosowane algorytmy, wzory, testy 
-i odpowiednie schematy.

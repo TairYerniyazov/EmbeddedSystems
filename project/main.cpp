@@ -16,4 +16,6 @@ int main(int argc, char *argv[]) {
   auto commMatrix = p.getCommMatrix();
   auto tasksMatrix = p.getTasksMatrix();
   p.debug();
+
+  
 }
