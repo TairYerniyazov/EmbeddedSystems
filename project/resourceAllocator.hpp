@@ -53,17 +53,26 @@ class ResourceAllocator {
           PE_instances_ids[1]++;
     }
   ~ResourceAllocator() {}
+  
   std::vector<int> findAllParents(int taskID) {
+    // Znajduje wszystkich rodziców (bezpośrednich poprzedników rozważanego
+    // zadania o numerze TaskID). Zwraca wektor zawierający numery tych zadań.
     std::vector<int> results{};
     for (int i = 0; i < nTasks; ++i)
       if (tasksAdjacencyMatrix[i][taskID])
         results.push_back(i);
     return results;
   }
+  
   double computeUsingStd(double p, double c, double t, double x, double y,
-    double z) { return x * p + y * c + z * t; }
+    double z) {
+    // Zwraca wynik wzoru na sumę składowych zależnych od standaryzowanych
+    // danych i współczynników. 
+    return x * p + y * c + z * t; 
+  }
+
   int findBest_std(int taskID) {
-    // TODO: wrzucać wynik do soft_max
+    // Znajduje najlepszy zasób zgodnie ze wzorem ComputeUsingStd
     std::vector<double> overallValues{};
     for (int i = 0; i < proc.d1; ++i)
       overallValues.push_back(computeUsingStd(procStd[i][0], costStd[taskID][i],
@@ -79,6 +88,9 @@ class ResourceAllocator {
     return bestResourceID;
   }
 
+  // TODO: dodać funkcję aktualizującą współczynniki i normalizujące je
+  // za pomocą Softmax.
+  
   int findBestParent(int taskID) {
     // Znajduje rodzica, który kończy się wykonywać najwcześniej, więc
     // jest poprzednikiem, który dla dziecka wyznacza ścieżkę
@@ -96,6 +108,7 @@ class ResourceAllocator {
     }
     return bestParentID;
   }
+
   int findBestChannel(int parentID, int childID) {
     // Znalezienie nalepszej szyny danych, czyli takiej, która zapewnia
     // łączność między poprzednikiem a następnikiem. Najpierw sprawdzamy czy
@@ -159,6 +172,7 @@ class ResourceAllocator {
       return idealChannel;
     }
   }
+
   bool allParentsHaveResources(int taskID) {
     // Sprawdzenie czy wszystkie bezpośrednie poprzedniki rozważanego zadania
     // mają zaalokowane dla nich zasoby. Ta funkcja jest przydatna dla
@@ -171,6 +185,7 @@ class ResourceAllocator {
         return false;
     return true;
   }
+
   bool canBeConnectedToBestParent(int taskID, int procID) {
     // Sprawdzenie czy da się podpiąć rozważane zadanie z najwcześniej kończącym
     // się poprzednikiem za pomocą którejś z szyn danych
@@ -197,6 +212,7 @@ class ResourceAllocator {
       return false;
     return true;
   }
+
   void recomputeAllPathsTime() {
     // Przeliczenie (aktualizacja odpowiednich pól) i wypisanie na wyjściu 
     for (int t = 0; t < nTasks; ++t) {
@@ -276,8 +292,10 @@ class ResourceAllocator {
                 << resources[tasks[t].resourceID].lastTaskEndTime << "]\n";
     }
   }
+
   void recomputeOverallTimeAndCost() {
-    // Przeliczenie całkowitego kosztu i czasu
+    // Przeliczenie całkowitego kosztu i czasu (aktualizacja pól prywatnych
+    // overallTime i overallCost)
     overallTime = 0;
     for (auto task : tasks)
       if (resources[task.resourceID].lastTaskEndTime > overallTime)
@@ -291,7 +309,10 @@ class ResourceAllocator {
       for (auto channelID : resources[task.resourceID].channelIDs)
         overallCost += channels[channelID].cost;
   }
+
   void debug() {
+    // Funkcja do debugowania. Wypisuje zawartość niektórych struktur, które
+    // mamy w grafie zadań.
     std::cerr << "ResourceAllocator::debug()\n";
     std::cerr << "ResourceAllocator::tasks\n";
     for (auto task : tasks)
@@ -308,6 +329,8 @@ class ResourceAllocator {
       std::cerr << "\n\n";
     }
   }
+
+  // Getter'y i Setter'y do zwracania atrybutów prywatnych
   double getOverallTime() { return overallTime; }
   double getOverallCost() { return overallCost; }
   void setMaxTime(double t) { t_max = t; }
