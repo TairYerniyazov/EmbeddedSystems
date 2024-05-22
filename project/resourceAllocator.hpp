@@ -30,6 +30,7 @@ class ResourceAllocator {
   double overallCost; // całkowity koszt
   double t_max; // maksymalny czas
   double c_max; // maksymalny koszt
+  std::vector<double> x_y_z; 
  public:
   ResourceAllocator(const Matrix<bool>& tAM, const Matrix<double>& proc_, 
   const Matrix<double>& times_, const Matrix<double>& cost_,
@@ -51,6 +52,8 @@ class ResourceAllocator {
           PE_instances_ids[0]++;
         else
           PE_instances_ids[1]++;
+   x_y_z.push_back(1/3);   x_y_z.push_back(1/3);    x_y_z.push_back(1/3);   // trzykrotnie, poniewaz jest to wektor 3-elementowy
+   // jezeli doftmax przyjmuje ten wektor, to zwraca nam nowy wektor (tak następuje aktualizacja)
     }
   ~ResourceAllocator() {}
   
@@ -78,7 +81,7 @@ class ResourceAllocator {
       overallValues.push_back(computeUsingStd(procStd[i][0], costStd[taskID][i],
         timesStd[taskID][i], 1/3, 1/3, 1/3));
     int bestResourceID = 0;
-    double minValue = overallValues[bestResourceID];
+    double minValue = overallValues[bestResourceID]; // tu znajdujemy wartosc minimalną (x*p + y*c + z*t) obliczaną z computeUsingStd (powyżej)
     for (int i = 0; i < (int)overallValues.size(); ++i) {
       if (overallValues[i] < minValue) {
         minValue = overallValues[i];
@@ -90,6 +93,20 @@ class ResourceAllocator {
 
   // TODO: dodać funkcję aktualizującą współczynniki i normalizujące je
   // za pomocą Softmax.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   int findBestParent(int taskID) {
     // Znajduje rodzica, który kończy się wykonywać najwcześniej, więc
