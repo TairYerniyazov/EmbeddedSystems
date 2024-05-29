@@ -28,12 +28,16 @@ Plan dostępny jest w pliku `project/todo.txt`.
 # Jak uruchomić (Linux)
 W tej chwili mamy zaimplementowane parsowanie dowolnego grafu zadań. Powstałe
 struktury są widoczne na wyjściu `cerr`. Za parsowanie odpowiada klasa `Parser`.
+
+Żeby zobaczyć dane wypisywane na `cerr` w celu debugowania kodu, wystarczy
+usunąć część "2>/dev/null" odpowiedzialną za przekierowanie strumienia błędów.
+ 
 ```shell
 cd project
 g++ -std=c++20 -Wall main.cpp parser.cpp
-./a.out data/test_structural_1.txt
-./a.out data/test_structural_2.txt
-./a.out data/test_structural_3.txt
+./a.out data/test_structural_1.txt 2>/dev/null
+./a.out data/test_structural_2.txt 2>/dev/null
+./a.out data/test_structural_3.txt 2>/dev/null
 ```
 
 ## Autorzy
