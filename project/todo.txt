@@ -12,6 +12,8 @@ Co już zrobiliśmy:
     2. Otrzymaliśmy odpowiedzi na pytania.
     3. Dodaliśmy szkielet (w tym ResourceAllocator).
     4. Utworzyliśmy plik z funkcjami i strukturami pomocnicznymi (utilities.hpp).
+    5. Uruchomiliśmy podstawowy przydział zasobów bez aktualizacji 
+    współczynników ani uwzględnienia zaalokowanych dotychczas zasobów.
 
 Plan postępowań:
 

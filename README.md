@@ -31,9 +31,9 @@ struktury są widoczne na wyjściu `cerr`. Za parsowanie odpowiada klasa `Parser
 ```shell
 cd project
 g++ -std=c++20 -Wall main.cpp parser.cpp
-./a.out data/graph.20.dat.txt
 ./a.out data/test_1.txt
 ./a.out data/test_2.txt
+./a.out data/test_3.txt
 ```
 
 ## Autorzy
