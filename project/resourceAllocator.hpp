@@ -18,13 +18,16 @@ class ResourceAllocator {
   Matrix<double> procStd;
   Matrix<double> costStd;
   Matrix<double> timesStd;
-  std::vector<Channel> channels;
-  std::vector<Task> tasks;
-  std::vector<PE> resources;
-  int nTasks;
-  int nPEs;
+  std::vector<Channel> channels; // wektor przechowujący wszystkie kanały w specyfikacji
+  std::vector<Task> tasks; // wektor przechowujący wszystkie zadania w specyfikacji
+  std::vector<PE> resources; // wszystkie do tej pory zaalokowane jednostki
+  int nTasks; // wszystkich w specyfikacji 
+  int nPEs; // wszystkich w specyfikacji
   int nChannels;
-  std::vector<int> PE_instances_ids;  // [nHC, nPP, nPE_1, nPE_2, ...]
+  std::vector<int> PE_instances_ids;  // [nHC, nPP, nPE_1, nPE_2, ...] //  ile zasobów zosało zaalokowanych do tej pory do każdego z typów. 
+   // ten wektor moze wygladac w ten sposob : [2,3,0,20,5,4,6]  czyli 2*HC 3*PP a reszta elementów w wektorze wskazuje 
+   // 0 razy użyliśmy HC_1, 20 razy użyliśmy HC_2, 5 razy użyliśmy PP_1 itd.
+   // Naużytek pomocniczego pola label
   Matrix<double> tasksMatrix;
   double overallTime; // całkowity czas
   double overallCost; // całkowity koszt
