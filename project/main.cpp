@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "utilities.hpp"
+#include "resourceAllocator.hpp"
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
@@ -17,4 +18,12 @@ int main(int argc, char *argv[]) {
   auto commMatrix = p.getCommMatrix();
   auto tasksMatrix = p.getTasksMatrix();
   p.debug();
+
+  ResourceAllocator r{tasksAdjacencyMatrix, procMatrix, timesMatrix,
+    costMatrix, commMatrix, tasksMatrix};
+  std::cout << "\n\e[32m\e[1mAlokacja zasobów metodą standaryzacji:\e[0m\n";
+  for (int t = 0; t < tasksMatrix.d1; ++t) {
+    r.allocate(t);
+  }
+  std::cout << '\n';
 }

@@ -52,6 +52,11 @@ class ResourceAllocator {
           PE_instances_ids[0]++;
         else
           PE_instances_ids[1]++;
+      // Standaryzacja tabel proc, times, cost
+      procStd = standardiseData(proc, true);
+      timesStd = standardiseData(times, false);
+      costStd = standardiseData(cost, false);
+
    x_y_z.push_back(1/3);   x_y_z.push_back(1/3);    x_y_z.push_back(1/3);   // trzykrotnie, poniewaz jest to wektor 3-elementowy
    // jezeli doftmax przyjmuje ten wektor, to zwraca nam nowy wektor (tak następuje aktualizacja)
     }
@@ -86,21 +91,10 @@ class ResourceAllocator {
 
   // TODO: dodać funkcję aktualizującą współczynniki i normalizujące je
   // za pomocą Softmax.
+//   void updateCoefficients {
+    
+//   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
   int findBestParent(int taskID) {
     // Znajduje rodzica, który kończy się wykonywać najwcześniej, więc
     // jest poprzednikiem, który dla dziecka wyznacza ścieżkę
@@ -318,6 +312,73 @@ class ResourceAllocator {
     for (auto task : tasks)
       for (auto channelID : resources[task.resourceID].channelIDs)
         overallCost += channels[channelID].cost;
+  }
+
+  void allocate(int taskID) {
+    // Alokuje zasób najlepszy z punktu widzenia findBest_std(taskID)
+    if (tasks[taskID].resourceID == -1) {
+      // Recursive bound
+      if (allParentsHaveResources(taskID)) {
+        std::cerr << "Allocating resources for T" << taskID << '\n';
+        // Resource allocation
+        int procID = findBest_std(taskID);
+        std::string resourceLabel = "undefined_label";
+        if (proc[procID][2] == 0)
+          resourceLabel = "HC";
+        else
+          resourceLabel = "PP";
+        int PE_type_count = 1;
+        for (int i = 0; i < procID; ++i)
+          if (proc[i][2] == proc[procID][2]) PE_type_count++;
+        resourceLabel += std::to_string(PE_type_count) + "_" +
+                         std::to_string(PE_instances_ids[2 + procID]++);
+        resources.push_back(PE(procID, resourceLabel));
+        tasks[taskID].resourceID = resources.size() - 1;
+        int channelID;
+        double startTime;
+        if (findAllParents(taskID).size() == 0) {
+          channelID = findBestChannel(-1, taskID);
+          startTime = 0;
+        } else {
+          int bestParentID = findBestParent(taskID);
+          channelID = findBestChannel(bestParentID, taskID);
+          startTime = (tasksMatrix[bestParentID][taskID] /
+                       channels[channelID].bandwidth) +
+                      resources[tasks[bestParentID].resourceID].lastTaskEndTime;
+          auto parentChannels =
+              resources[tasks[bestParentID].resourceID].channelIDs;
+          if (std::find(parentChannels.begin(), parentChannels.end(),
+                        channelID) == parentChannels.end())
+            resources[tasks[bestParentID].resourceID].channelIDs.push_back(
+                channelID);
+        }
+        resources[tasks[taskID].resourceID].channelIDs.push_back(channelID);
+        double endTime = startTime + times[taskID][procID];
+        resources[tasks[taskID].resourceID].lastTaskStartTime = startTime;
+        resources[tasks[taskID].resourceID].lastTaskEndTime = endTime;
+        std::cout << "  T" << taskID << " --> "
+                  << resources[tasks[taskID].resourceID].label
+                  << " [startTime: " << startTime << ", endTime: " << endTime
+                  << "]\n";
+        if (taskID == nTasks - 1) {
+          std::cerr << '\n';
+          for (int tID = 0; tID < nTasks; ++tID) {
+            std::cerr << "ResourceAllocator::allocate:\n  T" << taskID 
+              << " resource is connected to channels: ";
+            for (auto channelID : resources[tasks[tID].resourceID].channelIDs)
+              std::cerr << channelID << " ";
+            std::cerr << '\n';
+          }
+          std::cerr << '\n';
+        }
+      } else {
+        // Recursive execution
+        std::vector<int> parentsIDs = findAllParents(taskID);
+        for (auto parentID : parentsIDs)
+          if (tasks[parentID].resourceID == -1) allocate(parentID);
+        allocate(taskID);
+      }
+    }
   }
 
   void debug() {

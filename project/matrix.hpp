@@ -35,7 +35,7 @@ class Matrix {
     elem = temp;
     d1 = m.d1;
     d2 = m.d2;
-    return this;
+    return *this;
   };
 };
 
