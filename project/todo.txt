@@ -1,10 +1,10 @@
 Temat projektu: 
 
 	Zaprojektować algorytm kosyntezy (algorytm konstrukcyjny) stricte na 
-    podstawie standaryzacji ("normalizacji"), uwzględniając bieżący stan systemu, 
-    czyli te czynniki globalne, które mogą aktualizować na bieżąco współczynniki 
-    standaryzacyjne. Druga część projektu: zaimplementować algorytm do 
-    przydziału nieprzewidzianych zadań.
+  podstawie standaryzacji ("normalizacji"), uwzględniając bieżący stan systemu, 
+  czyli te czynniki globalne, które mogą aktualizować na bieżąco współczynniki 
+  standaryzacyjne. Druga część projektu: zaimplementować algorytm do 
+  przydziału nieprzewidzianych zadań.
 
 Co już zrobiliśmy:
 
@@ -15,22 +15,21 @@ Co już zrobiliśmy:
     5. Uruchomiliśmy podstawowy przydział zasobów bez aktualizacji 
     współczynników ani uwzględnienia zaalokowanych dotychczas zasobów.
 
-Plan postępowań:
+Co zostało do zrobienia:
 
-    1. Łączymy zadanie 6. (algorytm konstrukcyjny) i zadanie 9. 
-    (przydział nieprzewidzianych zadań).
+    1. Dodać przeliczenie współczynników zgodnie ze wzorem na pęd.
 
-    2. Dodać implementację wzoru na softmax przy przeliczeniu współczynników. Rozważamy
-    zaalokowane dotychczas. Wybieramy najlepsze zgodnie z naszym wzorem
+    2. Dodać do ResourceAllocator::allocate() rozważanie zaalokowanych
+    dotychczas zasobów: wybieramy najlepsze zgodnie z naszym wzorem
     standaryzacyjnym i potem patrzymy na to, które zasoby mamy wolne teraz,
     a który wybraliśmy. Jeśli koszt i czas (oczywiście zależy od tego, co dla
     nas w tej chwili jest ważniejsze) pasują, to wybieramy stary zasób i
     wykonujemy na nim. Jeśli nie, to śmiało kupujemy nowy zasób.
 
-    3. Uwzględniamy szyny komunikacyjne (czyli tak jak to rozwiązanie z
-    zadania 7. dotyczącego algorytmu rafinacyjnego).
+    3. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
+    HC. Operujemy na zasobach już zaalokowanych dotychczas i szeregujemy 
+    listowo. Utworzyć kilka grafów testowych o nazwie 
+    "data/test_unpredicted_#.txt".
 
-    4. W przypadku nieprzewidzianych zadań nie ruszamy HC. Operujemy na zasobach
-    już zaalokowanych dotychczas i szeregujemy listowo.
-
-    5. Utworzyć plik README + schemat, w którym bedą wszystkie wzory.
+    4. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
+    przykładowe grafy, opis Flow całego algorytmu.
