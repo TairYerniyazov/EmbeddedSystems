@@ -14,22 +14,31 @@ Co już zrobiliśmy:
     4. Utworzyliśmy plik z funkcjami i strukturami pomocnicznymi (utilities.hpp).
     5. Uruchomiliśmy podstawowy przydział zasobów bez aktualizacji 
     współczynników ani uwzględnienia zaalokowanych dotychczas zasobów.
+    6. Dodaliśmy przeliczenie współczynników zgodnie ze wzorem na pęd.
+    7. Dodaliśmy uwzględnienie przypadków, kiedy dziecko chce mieć zasób, 
+    którego nie da się podpiąć do rodzica.
 
 Co zostało do zrobienia:
 
-    1. Dodać przeliczenie współczynników zgodnie ze wzorem na pęd.
-
+    1. Dodać ustalenie maksymalnego czasu i kosztu z poziomu powłoki (argumenty
+    wywołania).
+    
     2. Dodać do ResourceAllocator::allocate() rozważanie zaalokowanych
     dotychczas zasobów: wybieramy najlepsze zgodnie z naszym wzorem
     standaryzacyjnym i potem patrzymy na to, które zasoby mamy wolne teraz,
     a który wybraliśmy. Jeśli koszt i czas (oczywiście zależy od tego, co dla
-    nas w tej chwili jest ważniejsze) pasują, to wybieramy stary zasób i
+    nas w tej chwili jest ważniejsze) pasują, to wybieramy stary wolny zasób i
     wykonujemy na nim. Jeśli nie, to śmiało kupujemy nowy zasób.
 
-    3. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
+    1. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
     HC. Operujemy na zasobach już zaalokowanych dotychczas i szeregujemy 
     listowo. Utworzyć kilka grafów testowych o nazwie 
     "data/test_unpredicted_#.txt".
 
     4. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
     przykładowe grafy, opis Flow całego algorytmu.
+
+Uwagi:
+
+  1. Całkowita liczba zasobów do zaalokowania jest szacowana, bo jest szansą,
+  że skorzystamy z już dostępnych zasobów.

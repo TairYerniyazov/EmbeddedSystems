@@ -3,7 +3,7 @@
 Parser::Parser() : nTasks{0} {}
 Parser::~Parser() {}
 
-void Parser::read(std::string filepath) {
+int Parser::read(std::string filepath) {
   std::ifstream inputFile;
   inputFile.open(filepath);
   if (inputFile.is_open()) {
@@ -96,9 +96,11 @@ void Parser::read(std::string filepath) {
         commMatrix[i][j] = std::stod(matches[0]);
         line = matches.suffix().str();
       }
+      return 0;
     }
-  } else { std::cerr << "The input file cannot be opened.\n"; }
+  } else { std::cout << "The input file cannot be opened.\n"; }
   inputFile.close();
+  return -1;
 }
 
 Matrix<bool>& Parser::getTasksAdjacencyMatrix() { return tasksAdjacencyMatrix; }

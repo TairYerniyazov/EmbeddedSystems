@@ -37,32 +37,33 @@ class ResourceAllocator {
  public:
   ResourceAllocator(const Matrix<bool>& tAM, const Matrix<double>& proc_, 
   const Matrix<double>& times_, const Matrix<double>& cost_,
-  const Matrix<double>& comm, const Matrix<double>& tasks_) : 
-    tasksAdjacencyMatrix{tAM}, proc{proc_},
-    times{times_}, cost{cost_}, nTasks{tAM.d1}, nPEs{proc_.d1},
-    nChannels{comm.d1}, PE_instances_ids{std::vector<int>(2 + proc.d1)},
-    tasksMatrix{tasks_}, overallTime{-1}, overallCost{-1}, t_max{-1} {
-      for (int i = 0; i < nTasks; ++i)
-        tasks.push_back(Task(i));
-      for (int i = 0; i < nChannels; ++i) {
-        channels.push_back(Channel(comm[i][0], comm[i][1], 
-          std::vector<bool>(nPEs), i));
-        for (int j = 0; j < nPEs; ++j)
-          channels[i].connections[j] = comm[i][2 + j];
-      }
-      for (int i = 0; i < nPEs; ++i)
-        if (proc[i][2] == 0)
-          PE_instances_ids[0]++;
-        else
-          PE_instances_ids[1]++;
-      // Standaryzacja tabel proc, times, cost
-      procStd = standardiseData(proc, true);
-      timesStd = standardiseData(times, false);
-      costStd = standardiseData(cost, false);
-
-   x_y_z.push_back(1/3);   x_y_z.push_back(1/3);    x_y_z.push_back(1/3);   // trzykrotnie, poniewaz jest to wektor 3-elementowy
-   // jezeli doftmax przyjmuje ten wektor, to zwraca nam nowy wektor (tak następuje aktualizacja)
+  const Matrix<double>& comm, const Matrix<double>& tasks_, double t_max_,
+  double c_max_) : 
+    tasksAdjacencyMatrix{tAM}, proc{proc_}, times{times_}, cost{cost_}, 
+    nTasks{tAM.d1}, nPEs{proc_.d1}, nChannels{comm.d1}, 
+    PE_instances_ids{std::vector<int>(2 + proc.d1)}, tasksMatrix{tasks_}, 
+    overallTime{0}, overallCost{0}, t_max{t_max_}, c_max{c_max_} {
+    for (int i = 0; i < nTasks; ++i)
+      tasks.push_back(Task(i));
+    for (int i = 0; i < nChannels; ++i) {
+      channels.push_back(Channel(comm[i][0], comm[i][1], 
+        std::vector<bool>(nPEs), i));
+      for (int j = 0; j < nPEs; ++j)
+        channels[i].connections[j] = comm[i][2 + j];
     }
+    for (int i = 0; i < nPEs; ++i)
+      if (proc[i][2] == 0)
+        PE_instances_ids[0]++;
+      else
+        PE_instances_ids[1]++;
+    // Standaryzacja tabel proc, times, cost
+    procStd = standardiseData(proc, true);
+    timesStd = standardiseData(times, false);
+    costStd = standardiseData(cost, false);
+    // Początkowe ustawienie współczynników
+    for (int c = 0; c < 3; c++)
+      x_y_z.push_back(1.0/3);     
+  }
   ~ResourceAllocator() {}
   
   std::vector<int> findAllParents(int taskID) {
@@ -76,27 +77,54 @@ class ResourceAllocator {
   }
 
   int findBest_std(int taskID) {
-    // Znajduje najlepszy zasób zgodnie ze wzorem ComputeUsingStd
+    // Sprawdź jakie zasoby ze wszystkich da się podpiąć do rodzica
+    std::vector<int> resourcesThatCanBeUsed{};
+    for (int i = 0; i < nPEs; ++i)
+      if (canBeConnectedToBestParent(taskID, i))
+        resourcesThatCanBeUsed.push_back(i);
+    // Liczenie wartości zgodnie ze wzorem ComputeUsingStd
     std::vector<double> overallValues{};
-    for (int i = 0; i < proc.d1; ++i)
-      overallValues.push_back(computeUsingStd(procStd[i][0], costStd[taskID][i],
-        timesStd[taskID][i], 1/3, 1/3, 1/3));
-    int bestResourceID = 0;
-    double minValue = overallValues[bestResourceID]; // tu znajdujemy wartosc minimalną (x*p + y*c + z*t) obliczaną z computeUsingStd (powyżej)
+    for (auto e : resourcesThatCanBeUsed)
+      overallValues.push_back(computeUsingStd(procStd[e][0], costStd[taskID][e],
+        timesStd[taskID][e], x_y_z[0], x_y_z[1], x_y_z[2]));
+    // Znalezienie najlepszego zasobu
+    int bestResourceID = resourcesThatCanBeUsed[0];
+    double minValue = overallValues[0]; // tu znajdujemy wartosc minimalną (x*p + y*c + z*t) obliczaną z computeUsingStd (powyżej)
     for (int i = 0; i < (int)overallValues.size(); ++i) {
       if (overallValues[i] < minValue) {
         minValue = overallValues[i];
-        bestResourceID = i;
+        bestResourceID = resourcesThatCanBeUsed[i];
       }
     }
     return bestResourceID;
   }
 
-  // TODO: dodać funkcję aktualizującą współczynniki i normalizujące je
-  // za pomocą Softmax.
-//   void updateCoefficients {
-    
-//   }
+  void updateCoefficients() {
+    // Aktualizuje współczynniki i normalizuje je za pomocą Softmax
+    // Wyliczenie liczby zadań, które nie mają przydzielonych zasobów
+    double n = 0;
+    for (int t = 0; t < nTasks; ++t)
+      if (tasks[t].resourceID != -1)
+        n++;
+    // Liczenie "masy"
+    auto m = 1 + n / nTasks;
+    // Liczenie wektora prędkości
+    auto v_proc_cost = overallCost / c_max - overallTime / t_max;
+    auto v_times = overallTime / t_max - overallCost / c_max;
+    // Liczenie wektora pędu
+    auto p_proc_cost = m * v_proc_cost;
+    auto p_times = m * v_times;
+    // Przeliczenie współczynników
+    std::cerr << "ResourceAllocator::updateCoefficients: Updating " 
+              << "the coefficients\n";
+    std::cerr << "  Old values: " << x_y_z[0] << " " << x_y_z[1] << " " 
+              << x_y_z[2] << '\n';
+    auto new_coeffs = softmax(x_y_z[0] + p_proc_cost, x_y_z[1] + p_proc_cost,
+      x_y_z[2] + p_times);
+    x_y_z = new_coeffs;
+    std::cerr << "  New values: " << x_y_z[0] << " " << x_y_z[1] << " "
+              << x_y_z[2] << '\n';
+  }
 
   int findBestParent(int taskID) {
     // Znajduje rodzica, który kończy się wykonywać najwcześniej, więc
@@ -208,7 +236,8 @@ class ResourceAllocator {
     for (auto channel : channels) {
       auto connections = channel.connections;
       if (connections[parentResourceProcID] && connections[procID]) {
-        std::cerr << "Connection between the parent PE (" << parentResourceProcID
+        std::cerr << "ResourceAllocator::canBeConnectedToBestParent()\n" 
+          << "  Connection between the parent PE (" << parentResourceProcID
           << ") and the current task (" << taskID << ") PE (" << procID
           << ") is possible on " << channel.id << '\n';  
         specificParentConnection = true;
@@ -305,16 +334,19 @@ class ResourceAllocator {
     // overallTime i overallCost)
     overallTime = 0;
     for (auto task : tasks)
-      if (resources[task.resourceID].lastTaskEndTime > overallTime)
+      if (task.resourceID != -1 && resources[task.resourceID].lastTaskEndTime >
+          overallTime)
         overallTime = resources[task.resourceID].lastTaskEndTime;
     overallCost = 0;
-    for (int t = 0; t < nTasks; ++t) {
-      overallCost += proc[resources[t].procID][0];
-      overallCost += cost[t][resources[tasks[t].resourceID].procID];
-    }
-    for (auto task : tasks)
-      for (auto channelID : resources[task.resourceID].channelIDs)
-        overallCost += channels[channelID].cost;
+    for (auto task : tasks) {
+      int id = task.resourceID;
+      if (id != -1) {
+        overallCost += proc[resources[id].procID][0];
+        overallCost += cost[task.id][resources[id].procID];
+        for (auto channelID : resources[id].channelIDs)
+          overallCost += channels[channelID].cost;
+      }
+    } 
   }
 
   void allocate(int taskID) {
@@ -322,7 +354,10 @@ class ResourceAllocator {
     if (tasks[taskID].resourceID == -1) {
       // Recursive bound
       if (allParentsHaveResources(taskID)) {
-        std::cerr << "Allocating resources for T" << taskID << '\n';
+        std::cerr << "ResourceAllocator::allocate(): Allocating resources for T" 
+          << taskID << '\n';
+        // Updating the coefficients
+        updateCoefficients();
         // Resource allocation
         int procID = findBest_std(taskID);
         std::string resourceLabel = "undefined_label";
@@ -374,6 +409,8 @@ class ResourceAllocator {
           }
           std::cerr << '\n';
         }
+        // Updating the overall time and cost
+        recomputeOverallTimeAndCost();
       } else {
         // Recursive execution
         std::vector<int> parentsIDs = findAllParents(taskID);

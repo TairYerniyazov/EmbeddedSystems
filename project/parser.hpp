@@ -22,7 +22,7 @@ class Parser {
  public:
   Parser();
   ~Parser();
-  void read(std::string filepath);
+  int read(std::string filepath);
   void debug();
   Matrix<bool>& getTasksAdjacencyMatrix();
   Matrix<double>& getTasksMatrix();

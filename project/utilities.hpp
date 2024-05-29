@@ -8,6 +8,7 @@
 #include <cmath>
 #include <vector>
 #include <numeric>
+#include <math.h>
 
 auto standardiseData(Matrix<double> data, bool firstColumnOnly) {
   int d1 = data.d1;
@@ -93,15 +94,15 @@ std::vector<double> softmax(double a, double b, double c) {
   // (współczynnika) w jego wartość wykładniczą.
   // Dzięki temu możemy później łatwo obliczyć prawdopodobieństwa, które sumują
   // się do 1.
-  double exp_a = std::exp(a);
-  double exp_b = std::exp(b);
-  double exp_c = std::exp(c);
+  auto exp_a = std::exp(a);
+  auto exp_b = std::exp(b);
+  auto exp_c = std::exp(c);
   // Sumujemy wartości wykładnicze
-  double sum_exp = exp_a + exp_b + exp_c;
+  auto sum_exp = exp_a + exp_b + exp_c;
   // Obliczamy wartości softmax
   std::vector<double> result = {exp_a / sum_exp, exp_b / sum_exp, 
     exp_c / sum_exp};
   return result;
-  }
+}
 
 #endif
