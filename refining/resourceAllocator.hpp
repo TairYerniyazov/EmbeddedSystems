@@ -579,15 +579,20 @@ class ResourceAllocator {
     }
   }
   void recomputeOverallTimeAndCost() {
+    // Liczenie czasu na podstawie zadania, które wykona się najpóźniej
     overallTime = 0;
     for (auto task : tasks)
       if (resources[task.resourceID].lastTaskEndTime > overallTime)
         overallTime = resources[task.resourceID].lastTaskEndTime;
+    // Koszt zakupu liczymy standardowo, zliczając zakupione jednostki
     overallCost = 0;
-    for (int t = 0; t < nTasks; ++t) {
-      overallCost += proc[resources[t].procID][0];
+    for (auto r : resources)
+      overallCost += proc[r.procID][0];
+    // Koszt wykonania liczymy, zliczając po zadaniach, bo kilka zadań
+    // mogą być wykonywanych na tym samym zasobie
+    for (int t = 0; t < nTasks; ++t)
       overallCost += cost[t][resources[tasks[t].resourceID].procID];
-    }
+    // Zliczenie kosztu podpięć do szyn danych
     for (auto task : tasks)
       for (auto channelID : resources[task.resourceID].channelIDs)
         overallCost += channels[channelID].cost;

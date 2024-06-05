@@ -33,7 +33,7 @@ class ResourceAllocator {
   double overallCost; // całkowity koszt
   double t_max; // maksymalny czas
   double c_max; // maksymalny koszt
-  std::vector<double> x_y_z; 
+  std::vector<double> x_y_z; // wektor współczynników do standaryzacji
  public:
   ResourceAllocator(const Matrix<bool>& tAM, const Matrix<double>& proc_, 
   const Matrix<double>& times_, const Matrix<double>& cost_,
@@ -360,35 +360,65 @@ class ResourceAllocator {
         updateCoefficients();
         // Resource allocation
         int procID = findBest_std(taskID);
-        std::string resourceLabel = "undefined_label";
-        if (proc[procID][2] == 0)
-          resourceLabel = "HC";
-        else
-          resourceLabel = "PP";
-        int PE_type_count = 1;
-        for (int i = 0; i < procID; ++i)
-          if (proc[i][2] == proc[procID][2]) PE_type_count++;
-        resourceLabel += std::to_string(PE_type_count) + "_" +
-                         std::to_string(PE_instances_ids[2 + procID]++);
-        resources.push_back(PE(procID, resourceLabel));
-        tasks[taskID].resourceID = resources.size() - 1;
+
+
+        // Sprawdzenie dostępności wybranego zasobu wśród już zaalokowanych
+        int allParents = findAllParents(taskID).size();
+        int bestParentID = allParents == 0 ? -1 : findBestParent(taskID);
+        double bestParentEndTime = bestParentID - 1 ? 0 : 
+          resources[tasks[bestParentID].resourceID].lastTaskEndTime;
+        
+        bool useAvailablePE = false;
+        for (int i = 0; i < (int)resources.size(); ++i) {
+          auto r = resources[i];
+          if (r.procID == procID)
+            if ((bestParentEndTime == 0 && r.lastTaskEndTime == 0) || 
+              (bestParentEndTime > 0 && bestParentEndTime > r.lastTaskEndTime)) {
+              tasks[taskID].resourceID = i;
+              useAvailablePE = true;
+              }
+        }
+
+        std::string resourceLabel;
+        if (useAvailablePE) {
+          resourceLabel = resources[tasks[taskID].resourceID].label;
+          std::cerr << "Available " << resources[tasks[taskID].resourceID].label
+            << " will be used for " << "T" << taskID << '\n';
+        } else {
+          resourceLabel = "undefined_label";
+          if (proc[procID][2] == 0)
+            resourceLabel = "HC";
+          else
+            resourceLabel = "PP";
+          int PE_type_count = 1;
+          for (int i = 0; i < procID; ++i)
+            if (proc[i][2] == proc[procID][2]) PE_type_count++;
+          resourceLabel += std::to_string(PE_type_count) + "_" +
+            std::to_string(PE_instances_ids[2 + procID]++);
+          resources.push_back(PE(procID, resourceLabel));
+          tasks[taskID].resourceID = resources.size() - 1;
+        }
+
         int channelID;
         double startTime;
-        if (findAllParents(taskID).size() == 0) {
+        if (bestParentID == -1) {
           channelID = findBestChannel(-1, taskID);
           startTime = 0;
         } else {
-          int bestParentID = findBestParent(taskID);
           channelID = findBestChannel(bestParentID, taskID);
-          startTime = (tasksMatrix[bestParentID][taskID] /
-                       channels[channelID].bandwidth) +
+          bool sameResource = tasks[bestParentID].resourceID ==
+            tasks[taskID].resourceID; 
+          startTime = (sameResource ? 0 : (tasksMatrix[bestParentID][taskID] /
+                       channels[channelID].bandwidth)) +
                       resources[tasks[bestParentID].resourceID].lastTaskEndTime;
-          auto parentChannels =
-              resources[tasks[bestParentID].resourceID].channelIDs;
-          if (std::find(parentChannels.begin(), parentChannels.end(),
-                        channelID) == parentChannels.end())
-            resources[tasks[bestParentID].resourceID].channelIDs.push_back(
-                channelID);
+          if (!sameResource) {
+            auto parentChannels =
+                resources[tasks[bestParentID].resourceID].channelIDs;
+            if (std::find(parentChannels.begin(), parentChannels.end(),
+                          channelID) == parentChannels.end())
+              resources[tasks[bestParentID].resourceID].channelIDs.push_back(
+                  channelID);
+          }
         }
         resources[tasks[taskID].resourceID].channelIDs.push_back(channelID);
         double endTime = startTime + times[taskID][procID];

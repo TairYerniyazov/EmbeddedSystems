@@ -17,25 +17,27 @@ Co już zrobiliśmy:
     6. Dodaliśmy przeliczenie współczynników zgodnie ze wzorem na pęd.
     7. Dodaliśmy uwzględnienie przypadków, kiedy dziecko chce mieć zasób, 
     którego nie da się podpiąć do rodzica.
+    8. Dodać do ResourceAllocator::allocate() rozważanie zaalokowanych
+    dotychczas zasobów: wybieramy najlepsze zgodnie z naszym wzorem
+    standaryzacyjnym i potem patrzymy na to, które zasoby mamy wolne teraz,
+    a który wybraliśmy. Jeśli ten typ zasobu jest wolny w momencie, kiedy rodzic
+    zadania (o ile posiada, wpp czas rozpoczęcia zadania to 0) przejdzie do
+    niego, to wybieramy dostępną kopię i wykonujemy na nim. Jeśli nie, to
+    kupujemy nowy zasób. Ostatnie przypadek występuje zdecydowanie częściej,
+    dlatego wynik działania naszego algorytmu konstrukcyjnego może być
+    dobrym punktem wyjściowym dla algorytmu rafinacyjnego.
 
 Co zostało do zrobienia:
 
     1. Dodać ustalenie maksymalnego czasu i kosztu z poziomu powłoki (argumenty
     wywołania).
-    
-    2. Dodać do ResourceAllocator::allocate() rozważanie zaalokowanych
-    dotychczas zasobów: wybieramy najlepsze zgodnie z naszym wzorem
-    standaryzacyjnym i potem patrzymy na to, które zasoby mamy wolne teraz,
-    a który wybraliśmy. Jeśli koszt i czas (oczywiście zależy od tego, co dla
-    nas w tej chwili jest ważniejsze) pasują, to wybieramy stary wolny zasób i
-    wykonujemy na nim. Jeśli nie, to śmiało kupujemy nowy zasób.
-
-    1. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
+  
+    2. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
     HC. Operujemy na zasobach już zaalokowanych dotychczas i szeregujemy 
     listowo. Utworzyć kilka grafów testowych o nazwie 
     "data/test_unpredicted_#.txt".
 
-    4. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
+    3. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
     przykładowe grafy, opis Flow całego algorytmu.
 
 Uwagi:
