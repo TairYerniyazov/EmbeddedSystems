@@ -3,12 +3,13 @@
 #include "resourceAllocator.hpp"
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
+  if (argc < 4) {
     std::cout << "Provide the task graph file name (e.g. "
-                 "graph.20.dat.txt) as an additional command line arguments.\n";
+                 "graph.20.dat.txt), as well as the maximum allowable time and "
+                 "cost, as additional command line arguments.\n";
     return 0;
   }
-  
+
   Parser p{};
   if (p.read(std::string(argv[1])) == -1)
     return 0;
@@ -20,13 +21,19 @@ int main(int argc, char *argv[]) {
   auto tasksMatrix = p.getTasksMatrix();
   p.debug();
 
-  ResourceAllocator r{tasksAdjacencyMatrix, procMatrix, timesMatrix,
-    costMatrix, commMatrix, tasksMatrix, 100, 10000};
+  ResourceAllocator r{tasksAdjacencyMatrix,
+                      procMatrix,
+                      timesMatrix,
+                      costMatrix,
+                      commMatrix,
+                      tasksMatrix,
+                      std::stod(std::string(argv[2])),
+                      std::stod(std::string(argv[3]))};
   std::cout << "\n\e[32m\e[1mAlokacja zasobów metodą standaryzacji:\e[0m\n";
   for (int t = 0; t < tasksMatrix.d1; ++t) {
     r.allocate(t);
   }
-  std::cout << "\n\e[31mOverall cost:\e[0m " << r.getOverallCost() << '\n';
-  std::cout << "\e[31mOverall time:\e[0m " << r.getOverallTime() << '\n';
+  std::cout << "\n\e[31mOverall time:\e[0m " << r.getOverallTime() << '\n';
+  std::cout << "\e[31mOverall cost:\e[0m " << r.getOverallCost() << '\n';
   std::cout << '\n';
 }
