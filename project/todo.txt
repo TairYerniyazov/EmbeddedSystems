@@ -20,15 +20,20 @@ Co już zrobiliśmy:
     8. Dodaliśmy do ResourceAllocator::allocate() rozważanie zaalokowanych
     dotychczas zasobów.
     9. Dodaliśmy ustalenie maksymalnego czasu i kosztu z poziomu powłoki.
+    10. Utworzyliśmy testowy graf (modyfikacja test_structural_1.txt) o nazwie
+    test_unpredicted_1.txt, w którym są dodane nieprzewidziane zadania.
 
 Co zostało do zrobienia:
 
-    1. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
+    1. Rozrysować graf test_structural_1.txt i test_unpredicted_1.txt, żeby
+    móc prześledzić przydział nieprzewidzianych zadań.
+
+    2. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
     HC. Operujemy na zasobach już zaalokowanych dotychczas i szeregujemy 
     listowo. Utworzyć kilka grafów testowych o nazwie 
     "data/test_unpredicted_#.txt".
 
-    2. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
+    3. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
     przykładowe grafy, opis Flow całego algorytmu.
 
 Uwagi:
