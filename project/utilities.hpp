@@ -61,12 +61,20 @@ struct PE {
 
 struct Task {
   int id;
-  int resourceID; // ID zasobu obliczeniowego przypisanego do zadania
+  int resourceID; // 1) ID zasobu obliczeniowego przypisanego do zadania przy
+                  // działaniu algorytmu konstrukcyjnego.
+                  // ALBO
+                  // 2) procID wybranego zasobu przy przydziału nieprzewidzanych
+                  // zadań.
   bool reallocated; // czy zasob zostal juz zaalokowany czy tez nie
-  Task() : id{-1}, resourceID{-1}, reallocated{false} {}
-  Task(int id_, int resourceID_, double pathTime_)
-      : id{id_}, resourceID{resourceID_}, reallocated{false} {}
-  Task(int id_) : Task(id_, -1, -1) {}
+  bool unpredicted; // czy zadanie jest nieprzewidziane czy nie
+  double pathTime = -1; // czas lokalnej ściezki krytycznej (-1 to undefined)
+  bool scheduled = false; // czy było poszeregowane czy nie
+  Task() : id{-1}, resourceID{-1}, reallocated{false}, unpredicted{false} {}
+  Task(int id_, int resourceID_, double pathTime_, bool u)
+      : id{id_}, resourceID{resourceID_}, reallocated{false}, 
+      unpredicted{u} {}
+  Task(int id_, bool u) : Task(id_, -1, -1, u) {}
   ~Task() {}
 };
 

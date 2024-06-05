@@ -19,6 +19,8 @@ class Parser {
   Matrix<double> timesMatrix{};
   Matrix<double> costMatrix{};
   Matrix<double> commMatrix{};
+  std::vector<bool> unpredictedTasksMask{}; // [True, False, False] - T1 i T2
+                                            // są prewidziane, T0 nieprzewidziane.
  public:
   Parser();
   ~Parser();
@@ -30,6 +32,7 @@ class Parser {
   Matrix<double>& getTimesMatrix();
   Matrix<double>& getCostMatrix();
   Matrix<double>& getCommMatrix();
+  std::vector<bool>& getUnpredictedTasksMask();
 };
 
 #endif

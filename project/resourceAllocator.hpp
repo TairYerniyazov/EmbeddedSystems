@@ -37,14 +37,14 @@ class ResourceAllocator {
  public:
   ResourceAllocator(const Matrix<bool>& tAM, const Matrix<double>& proc_, 
   const Matrix<double>& times_, const Matrix<double>& cost_,
-  const Matrix<double>& comm, const Matrix<double>& tasks_, double t_max_,
-  double c_max_) : 
+  const Matrix<double>& comm, const Matrix<double>& tasks_, 
+  std::vector<bool> utm, double t_max_, double c_max_) : 
     tasksAdjacencyMatrix{tAM}, proc{proc_}, times{times_}, cost{cost_}, 
     nTasks{tAM.d1}, nPEs{proc_.d1}, nChannels{comm.d1}, 
     PE_instances_ids{std::vector<int>(2 + proc.d1)}, tasksMatrix{tasks_}, 
     overallTime{0}, overallCost{0}, t_max{t_max_}, c_max{c_max_} {
     for (int i = 0; i < nTasks; ++i)
-      tasks.push_back(Task(i));
+      tasks.push_back(Task(i, utm[i]));
     for (int i = 0; i < nChannels; ++i) {
       channels.push_back(Channel(comm[i][0], comm[i][1], 
         std::vector<bool>(nPEs), i));
@@ -353,7 +353,6 @@ class ResourceAllocator {
 
   void allocate(int taskID) {
     // Alokuje zasób najlepszy z punktu widzenia findBest_std(taskID)
-
     if (tasks[taskID].resourceID == -1) {
       // Recursive bound
       if (allParentsHaveResources(taskID)) {
@@ -458,7 +457,8 @@ class ResourceAllocator {
     std::cerr << "ResourceAllocator::debug()\n";
     std::cerr << "ResourceAllocator::tasks\n";
     for (auto task : tasks)
-      std::cerr << "  id: " << task.id << "; reallocated: " 
+      std::cerr << "  unpredicted: " << task.unpredicted << "; id: " << task.id 
+      << "; reallocated: " 
       << (task.reallocated ? "true" : "false") << "; resourceID: " 
       << task.resourceID << '\n';
     std::cerr << "\nResourceAllocator::channels\n";
@@ -469,6 +469,107 @@ class ResourceAllocator {
       for (int j = 0; j < (int)channels[i].connections.size(); ++j)
         std::cerr << (channels[i].connections[j] ? "↑" : "↓") << ' ';
       std::cerr << "\n\n";
+    }
+  }
+
+  int findBest_timeCost(int taskID, bool unpredicted) {
+    std::vector<double> overallValues{};
+    std::vector<int> procIDs{};
+    for (int i = 0; i < proc.d1; ++i)
+      if (unpredicted) {
+        if (proc[i][2] == 1) {
+          overallValues.push_back(times[taskID][i] * cost[taskID][i]);
+          procIDs.push_back(i);
+        }
+      } else {
+        overallValues.push_back(times[taskID][i] * cost[taskID][i]);
+        procIDs.push_back(i);
+      }
+    int bestResourceID = procIDs[0];
+    double minValue = overallValues[bestResourceID];
+    for (int i = 0; i < (int)overallValues.size(); ++i) {
+      if (overallValues[i] < minValue) {
+        minValue = overallValues[i];
+        bestResourceID = procIDs[i];
+      }
+    }
+    return bestResourceID;
+  }
+
+  double computeCriticalPath(int taskID) {
+    int nNextTasks = 0;
+    for (int i = 0; i < nTasks; ++i)
+      if (tasksAdjacencyMatrix[taskID][i])
+        nNextTasks++;
+    // Recursive break
+    if (nNextTasks == 0) {
+      double singleJobTime = times[taskID][tasks[taskID].resourceID];
+      tasks[taskID].pathTime = singleJobTime;
+      return singleJobTime;
+    }
+    // Recursive search
+    std::vector<double> possiblePathTimes{}; 
+    for (int i = 0; i < nTasks; ++i)
+      if (tasksAdjacencyMatrix[taskID][i])
+        possiblePathTimes.push_back(computeCriticalPath(i));
+    double maxTime = possiblePathTimes[0];
+    for (auto e : possiblePathTimes)
+      if (e > maxTime)
+        maxTime = e;
+    tasks[taskID].pathTime = maxTime;
+    return maxTime + times[taskID][tasks[taskID].resourceID];
+  }
+
+  int findNextTaskInSchedule() {
+    int taskID = 0;
+    double maxTime = 0;
+    for (int i = 0; i < nTasks; ++i)
+      if (!tasks[i].scheduled)
+        tasks[i].pathTime = computeCriticalPath(i);
+    for (int i = 0; i < nTasks; ++i)
+      if (!tasks[i].scheduled && 
+        tasks[i].pathTime > maxTime) {
+        maxTime = tasks[i].pathTime;
+        taskID = i;
+      }
+    return taskID;      
+  }
+
+  void scheduleAllTasks() {
+    for (int i = 0; i < nTasks; ++i) {
+      int nextTask = findNextTaskInSchedule();
+      if (i == 0)
+        std::cout << "  ";
+      std::cout << (tasks[nextTask].unpredicted ? "u" : "") << "T" << nextTask;
+      if (i != nTasks - 1)
+        std::cout << " --> ";
+      tasks[nextTask].scheduled = true;
+      tasks[nextTask].pathTime = -1;
+    }
+    std::cout << '\n';
+  }
+
+  void allocateMinTime() {
+    // Alokuje wszystkie zasoby zgodnie z kryterium "min(time * cost)", przy
+    // czym nieprzewidziany zadania mają dostęp tylko do zasobow
+    // uniwersalnych
+    for (int t = 0; t < nTasks; ++t) {
+      int bestResourceID;
+      bestResourceID = findBest_timeCost(t, tasks[t].unpredicted);
+      tasks[t].resourceID = bestResourceID;
+
+      std::string resourceLabel = "undefined_label";
+      if (proc[bestResourceID][2] == 0)
+        resourceLabel = "HC";
+      else
+        resourceLabel = "PP";
+      int PE_type_count = 1;
+      for (int i = 0; i < bestResourceID; ++i)
+        if (proc[i][2] == proc[bestResourceID][2]) PE_type_count++;
+      resourceLabel += std::to_string(PE_type_count);
+
+      std::cout << (tasks[t].unpredicted ? "  u" : "  ") << "T" << t << " --> " 
+        << resourceLabel << '\n';
     }
   }
 

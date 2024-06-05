@@ -3,10 +3,11 @@
 #include "resourceAllocator.hpp"
 
 int main(int argc, char *argv[]) {
-  if (argc < 4) {
-    std::cout << "Provide the task graph file name (e.g. "
-                 "graph.20.dat.txt), as well as the maximum allowable time and "
-                 "cost, as additional command line arguments.\n";
+  if (argc < 5) {
+    std::cout << "\nRun the program as the following:\n\n"
+      << "  $ ./program [data] [max time] [max cost] [choice]\n"
+      << "\n  Choice = 1: using a structural algorithm;\n"
+      << "  Choice = 2: handling unpredicted tasks.\n\n";
     return 0;
   }
 
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]) {
   auto costMatrix = p.getCostMatrix();
   auto commMatrix = p.getCommMatrix();
   auto tasksMatrix = p.getTasksMatrix();
+  auto unpredictedTasksMask = p.getUnpredictedTasksMask();
   p.debug();
 
   ResourceAllocator r{tasksAdjacencyMatrix,
@@ -27,13 +29,27 @@ int main(int argc, char *argv[]) {
                       costMatrix,
                       commMatrix,
                       tasksMatrix,
+                      unpredictedTasksMask,
                       std::stod(std::string(argv[2])),
                       std::stod(std::string(argv[3]))};
-  std::cout << "\n\e[32m\e[1mAlokacja zasobów metodą standaryzacji:\e[0m\n";
-  for (int t = 0; t < tasksMatrix.d1; ++t) {
-    r.allocate(t);
+  
+  int choice = std::stod(std::string(argv[4]));
+  if (choice == 1) {
+    std::cout << "\n\e[32m\e[1mAlokacja zasobów metodą standaryzacji:\e[0m\n";
+    for (int t = 0; t < tasksMatrix.d1; ++t) {
+      r.allocate(t);
+    }
+    std::cout << "\n\e[34mCałkowity czas wykonania:\e[0m " << r.getOverallTime() 
+      << '\n';
+    std::cout << "\e[34mCałkowity koszt:\e[0m " << r.getOverallCost() << '\n';
+    std::cout << '\n';
+  } else if (choice == 2) {
+    r.debug();
+    std::cout << "\n\e[32m\e[1mPoczątkowy przydział zasobów\e[0m\n";
+    r.allocateMinTime();
+    std::cout << "\n\e[34m\e[1mPoszeregowane zadania "
+      << "(w tym nieprzewidziane):\e[0m\n";
+    r.scheduleAllTasks();
+    std::cout << '\n';
   }
-  std::cout << "\n\e[31mOverall time:\e[0m " << r.getOverallTime() << '\n';
-  std::cout << "\e[31mOverall cost:\e[0m " << r.getOverallCost() << '\n';
-  std::cout << '\n';
 }

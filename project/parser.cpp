@@ -19,10 +19,12 @@ int Parser::read(std::string filepath) {
     tasksMatrix.build(nTasks, nTasks);
     // @tasks - body
     while (getline(inputFile, line)) {
-      pat = R"(u*(T)u*(\d{1,}) (\d{1,}))";
+      pat = R"((u*)(T)(\d{1,}) (\d{1,}))";
       if (std::regex_search(line, matches, pat)) {
         int taskID;
-        taskID = std::stoi(matches.str(2));
+        bool unpredicted = (matches.str(1) == "u" ? true : false);
+        unpredictedTasksMask.push_back(unpredicted);
+        taskID = std::stoi(matches.str(3));
         line = matches.suffix().str();
         pat = R"((\d{1,})\((\d{1,})\))";
         while (std::regex_search(line, matches, pat)) {
@@ -108,7 +110,8 @@ Matrix<double>& Parser::getTasksMatrix() { return tasksMatrix; }
 Matrix<double>& Parser::getProcMatrix() { return procMatrix; }
 Matrix<double>& Parser::getTimesMatrix() { return timesMatrix; }
 Matrix<double>& Parser::getCostMatrix() { return costMatrix; }
-Matrix<double>& Parser::getCommMatrix() { return commMatrix; }
+Matrix<double>& Parser::getCommMatrix() { return commMatrix; }  
+std::vector<bool>& Parser::getUnpredictedTasksMask() { return unpredictedTasksMask; }
 
 void Parser::debug() {
   std::cerr << "\nParser::debug()\n";

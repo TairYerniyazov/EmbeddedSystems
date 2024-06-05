@@ -21,19 +21,15 @@ Co już zrobiliśmy:
     dotychczas zasobów.
     9. Dodaliśmy ustalenie maksymalnego czasu i kosztu z poziomu powłoki.
     10. Utworzyliśmy testowy graf (modyfikacja test_structural_1.txt) o nazwie
-    test_unpredicted_1.txt, w którym są dodane nieprzewidziane zadania.
+    test_unpredicted.txt, w którym są dodane nieprzewidziane zadania.
+    11. Zaimplementowaliśmy przydział nieprzewidzianych zadań na podstawie
+    rozwiązania zadania #9 (przydział zgodnie z kryterium min(time * cost) i
+    szeregowanie listowe. Podczas przydziału zadania nieprzewidziane nie mogą
+    korzystać z jednostek specjalistycznych).
 
 Co zostało do zrobienia:
 
-    1. Rozrysować graf test_structural_1.txt i test_unpredicted_1.txt, żeby
-    móc prześledzić przydział nieprzewidzianych zadań.
-
-    2. Przydział nieprzewidzianych zadań (bazując na zadaniu 9.): nie ruszamy 
-    HC. Operujemy na zasobach już zaalokowanych dotychczas i szeregujemy 
-    listowo. Utworzyć kilka grafów testowych o nazwie 
-    "data/test_unpredicted_#.txt".
-
-    3. Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
+    Utworzyć plik README + schemat, w którym bedą wszystkie wzory,
     przykładowe grafy, opis Flow całego algorytmu.
 
 Uwagi:
@@ -48,3 +44,8 @@ Uwagi:
   na nią. Jeśli nie, to kupujemy nowy zasób. Ostatnie przypadek występuje 
   zdecydowanie częściej, dlatego wynik działania naszego algorytmu 
   konstrukcyjnego może być służyć za punkt wyjścia dla algorytmu rafinacyjnego.
+  3. Przydział nieprzewidzianych zadań z załozenia nie uwzględnia szyn
+  komunikacyjnych (gdybyśmy uwzględniali to, to nie zawsze bylibyśmy w stanie
+  wykonać nieprzewidziane zadania, poniewaz mozemy nie mieć połączeń między
+  tymi zasobami, które są dostępne po usunięciu z listy dostępnych jednostek
+  procesorów specjalistycznych. Takich problemów nie rozwazaliśmy na zajęciach).
