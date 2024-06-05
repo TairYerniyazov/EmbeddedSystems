@@ -20,7 +20,7 @@ auto standardiseData(Matrix<double> data, bool firstColumnOnly) {
   double std = 0;
   for (int i = 0; i < d1; ++i)
     for (int j = 0; j < d2; ++j) std += std::pow(data[i][j] - mean, 2);
-  std /= std::sqrt(std / (d1 * d2));
+  std = std::sqrt(std / (d1 * d2));
   for (int i = 0; i < d1; ++i)
     for (int j = 0; j < d2; ++j) data[i][j] = (data[i][j] - mean) / std;
   return data;
