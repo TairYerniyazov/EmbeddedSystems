@@ -257,54 +257,56 @@ class ResourceAllocator {
       int bestParentID = findBestParent(t);
       std::cerr << "Best parent for T" << t << " is " << bestParentID << '\n';
       if (bestParentID != -1) {
-        auto taskChannelIDs = resource.channelIDs;
-        auto parentChannelIDs = 
-          resources[tasks[bestParentID].resourceID].channelIDs;
-        int channelChoice = -1;
-        
-        std::cerr << "T" << t << " channels:\n";
-        for (auto channel : resources[tasks[t].resourceID].channelIDs)
-          std::cerr << channel << ' ';
-        std::cerr << '\n';
-        std::cerr << "T" << bestParentID << " (parent) channels:\n";
-        for (auto channel : resources[tasks[bestParentID].resourceID].channelIDs)
-          std::cerr << channel << ' ';
-        std::cerr << '\n';
+        if (tasks[t].resourceID != tasks[bestParentID].resourceID) {
+          auto taskChannelIDs = resource.channelIDs;
+          auto parentChannelIDs = 
+            resources[tasks[bestParentID].resourceID].channelIDs;
+          int channelChoice = -1;
+          
+          std::cerr << "T" << t << " channels:\n";
+          for (auto channel : resources[tasks[t].resourceID].channelIDs)
+            std::cerr << channel << ' ';
+          std::cerr << '\n';
+          std::cerr << "T" << bestParentID << " (parent) channels:\n";
+          for (auto channel : resources[tasks[bestParentID].resourceID].channelIDs)
+            std::cerr << channel << ' ';
+          std::cerr << '\n';
 
-        for (auto task : taskChannelIDs) {
-          if (std::find(parentChannelIDs.begin(), parentChannelIDs.end(), task)
-            != parentChannelIDs.end())
-            channelChoice = task;
-        }
-        // Best parent can be changed, so we need to make sure the parent can 
-        // be connected to its new child
-        if (channelChoice == -1) {
-          int channel = findBestChannel(bestParentID, t);
-          // std::cerr << "FindBestChannel for parent T" << bestParentID  << " and"
-            // << " child T" << t << " : " << channel << '\n';
-          if (std::find(taskChannelIDs.begin(), taskChannelIDs.end(), channel)
-            == taskChannelIDs.end())
-            resources[tasks[t].resourceID].channelIDs.push_back(channel);
-          if (std::find(parentChannelIDs.begin(), parentChannelIDs.end(),
-                        channel) == parentChannelIDs.end())
-            resources[tasks[bestParentID].resourceID].channelIDs.push_back(channel);
-          channelChoice = channel;
-        }
-        std::cerr << channelChoice << '\n';
-
-        int minCost = channels[channelChoice].cost;
-        for (auto channel : taskChannelIDs) {
-          std::cerr << "T" << t << " has parent T"
-                    << bestParentID << " [channel " << channel << "]\n";
-          if (std::find(parentChannelIDs.begin(), parentChannelIDs.end(),
-                        channel) != parentChannelIDs.end() &&
-              channels[channel].cost < minCost) {
+          for (auto task : taskChannelIDs) {
+            if (std::find(parentChannelIDs.begin(), parentChannelIDs.end(), task)
+              != parentChannelIDs.end())
+              channelChoice = task;
+          }
+          // Best parent can be changed, so we need to make sure the parent can 
+          // be connected to its new child
+          if (channelChoice == -1) {
+            int channel = findBestChannel(bestParentID, t);
+            // std::cerr << "FindBestChannel for parent T" << bestParentID  << " and"
+              // << " child T" << t << " : " << channel << '\n';
+            if (std::find(taskChannelIDs.begin(), taskChannelIDs.end(), channel)
+              == taskChannelIDs.end())
+              resources[tasks[t].resourceID].channelIDs.push_back(channel);
+            if (std::find(parentChannelIDs.begin(), parentChannelIDs.end(),
+                          channel) == parentChannelIDs.end())
+              resources[tasks[bestParentID].resourceID].channelIDs.push_back(channel);
             channelChoice = channel;
           }
+          std::cerr << channelChoice << '\n';
+
+          int minCost = channels[channelChoice].cost;
+          for (auto channel : taskChannelIDs) {
+            std::cerr << "T" << t << " has parent T"
+                      << bestParentID << " [channel " << channel << "]\n";
+            if (std::find(parentChannelIDs.begin(), parentChannelIDs.end(),
+                          channel) != parentChannelIDs.end() &&
+                channels[channel].cost < minCost) {
+              channelChoice = channel;
+            }
+          }
+          resources[tasks[t].resourceID].lastTaskStartTime = 
+            resources[tasks[bestParentID].resourceID].lastTaskEndTime 
+            + tasksMatrix[bestParentID][t] / channels[channelChoice].bandwidth;
         }
-        resources[tasks[t].resourceID].lastTaskStartTime = 
-          resources[tasks[bestParentID].resourceID].lastTaskEndTime 
-          + tasksMatrix[bestParentID][t] / channels[channelChoice].bandwidth;
         resources[tasks[t].resourceID].lastTaskEndTime = 
           resources[tasks[t].resourceID].lastTaskStartTime +
           times[t][resources[tasks[t].resourceID].procID];
@@ -351,6 +353,7 @@ class ResourceAllocator {
 
   void allocate(int taskID) {
     // Alokuje zasób najlepszy z punktu widzenia findBest_std(taskID)
+
     if (tasks[taskID].resourceID == -1) {
       // Recursive bound
       if (allParentsHaveResources(taskID)) {
@@ -360,25 +363,21 @@ class ResourceAllocator {
         updateCoefficients();
         // Resource allocation
         int procID = findBest_std(taskID);
-
-
         // Sprawdzenie dostępności wybranego zasobu wśród już zaalokowanych
         int allParents = findAllParents(taskID).size();
         int bestParentID = allParents == 0 ? -1 : findBestParent(taskID);
-        double bestParentEndTime = bestParentID - 1 ? 0 : 
+        double bestParentEndTime = bestParentID == - 1 ? 0 : 
           resources[tasks[bestParentID].resourceID].lastTaskEndTime;
-        
         bool useAvailablePE = false;
         for (int i = 0; i < (int)resources.size(); ++i) {
           auto r = resources[i];
           if (r.procID == procID)
             if ((bestParentEndTime == 0 && r.lastTaskEndTime == 0) || 
-              (bestParentEndTime > 0 && bestParentEndTime > r.lastTaskEndTime)) {
+            (bestParentEndTime > 0 && bestParentEndTime > r.lastTaskEndTime)) {
               tasks[taskID].resourceID = i;
               useAvailablePE = true;
-              }
+            }
         }
-
         std::string resourceLabel;
         if (useAvailablePE) {
           resourceLabel = resources[tasks[taskID].resourceID].label;
@@ -401,13 +400,13 @@ class ResourceAllocator {
 
         int channelID;
         double startTime;
+        bool sameResource =
+            tasks[bestParentID].resourceID == tasks[taskID].resourceID;
         if (bestParentID == -1) {
           channelID = findBestChannel(-1, taskID);
           startTime = 0;
         } else {
           channelID = findBestChannel(bestParentID, taskID);
-          bool sameResource = tasks[bestParentID].resourceID ==
-            tasks[taskID].resourceID; 
           startTime = (sameResource ? 0 : (tasksMatrix[bestParentID][taskID] /
                        channels[channelID].bandwidth)) +
                       resources[tasks[bestParentID].resourceID].lastTaskEndTime;
@@ -420,7 +419,9 @@ class ResourceAllocator {
                   channelID);
           }
         }
-        resources[tasks[taskID].resourceID].channelIDs.push_back(channelID);
+        
+        if (!useAvailablePE)
+          resources[tasks[taskID].resourceID].channelIDs.push_back(channelID);
         double endTime = startTime + times[taskID][procID];
         resources[tasks[taskID].resourceID].lastTaskStartTime = startTime;
         resources[tasks[taskID].resourceID].lastTaskEndTime = endTime;
@@ -431,10 +432,10 @@ class ResourceAllocator {
         if (taskID == nTasks - 1) {
           std::cerr << '\n';
           for (int tID = 0; tID < nTasks; ++tID) {
-            std::cerr << "ResourceAllocator::allocate:\n  T" << taskID 
-              << " resource is connected to channels: ";
-            for (auto channelID : resources[tasks[tID].resourceID].channelIDs)
-              std::cerr << channelID << " ";
+            std::cerr << "ResourceAllocator::allocate:\n  T" << tID
+                      << " resource is connected to channels: ";
+            for (auto cID : resources[tasks[tID].resourceID].channelIDs)
+              std::cerr << cID << " ";
             std::cerr << '\n';
           }
           std::cerr << '\n';

@@ -96,8 +96,8 @@ int Parser::read(std::string filepath) {
         commMatrix[i][j] = std::stod(matches[0]);
         line = matches.suffix().str();
       }
-      return 0;
     }
+    return 0;
   } else { std::cout << "The input file cannot be opened.\n"; }
   inputFile.close();
   return -1;
