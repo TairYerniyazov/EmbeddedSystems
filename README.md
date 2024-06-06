@@ -1,12 +1,17 @@
+# Temat projektu
+
+Zaprojektować algorytm kosyntezy (algorytm konstrukcyjny) na 
+podstawie standaryzacji ("normalizacji"), uwzględniając bieżący stan systemu, 
+czyli te czynniki globalne, które mogą aktualizować na bieżąco współczynniki 
+standaryzacyjne. Druga część projektu: zaimplementować algorytm do 
+przydziału nieprzewidzianych zadań.
+
 # Opis plików
 
-W katalogu `project/` są pliki dotyczące samego projektu. Plan dostępny jest 
-w pliku `project/todo.txt`.
+W katalogu `project/` są pliki dotyczące samego projektu. Szczegółowy opis
+całej pracy dostępny jest w katalogu `description/`.
 
 # Jak uruchomić (Linux)
-W tej chwili mamy zaimplementowane parsowanie dowolnego grafu zadań. Powstałe
-struktury są widoczne na wyjściu `cerr`. Za parsowanie odpowiada klasa `Parser`.
-
 Żeby zobaczyć dane wypisywane na `cerr` w celu debugowania kodu, wystarczy
 usunąć część `2>/dev/null` odpowiedzialną za przekierowanie strumienia błędów.
 
@@ -29,7 +34,7 @@ g++ -std=c++20 -Wall main.cpp parser.cpp
 
 ./a.out data/test_structural_4.txt 100000 100000 1 2>/dev/null
 
-./a.out data/test_unpredicted.txt 100000 100000 2 2>/dev/null
+./a.out data/test_unpredicted.txt 0 0 2 2>/dev/null
 ```
 
 ## Autorzy
