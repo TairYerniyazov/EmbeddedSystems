@@ -1,9 +1,9 @@
-# Temat projektu
+# Temat
 
-Zaprojektować algorytm kosyntezy (algorytm konstrukcyjny) na 
-podstawie standaryzacji ("normalizacji"), uwzględniając bieżący stan systemu, 
-czyli te czynniki globalne, które mogą aktualizować na bieżąco współczynniki 
-standaryzacyjne. Druga część projektu: zaimplementować algorytm do 
+Opracowanie algorytmu kosyntezy (algorytm konstrukcyjny) na 
+podstawie standaryzacji parametrów, uwzględniając bieżący stan systemu, 
+czyli czynniki globalne, które mogą aktualizować na bieżąco współczynniki 
+standaryzacyjne. Dodatkowa część: implementacja algorytmu do 
 przydziału nieprzewidzianych zadań.
 
 # Opis plików
@@ -11,11 +11,11 @@ przydziału nieprzewidzianych zadań.
 W katalogu `project/` są pliki dotyczące samego projektu. Szczegółowy opis
 całej pracy dostępny jest w katalogu `description/`.
 
-# Jak uruchomić (Linux)
+# Instrukcje uruchomienia (Linux)
 Żeby zobaczyć dane wypisywane na `cerr` w celu debugowania kodu, wystarczy
 usunąć część `2>/dev/null` odpowiedzialną za przekierowanie strumienia błędów.
 
-Program uruchamiamy zgodnie ze wzorem:
+Program należy uruchamiać zgodnie ze wzorem:
 ```
 ./[program.out] [task graph filepath] [max time] [max cost] [1/2] 2>dev/null
 ```
